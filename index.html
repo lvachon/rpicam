@@ -1,0 +1,18 @@
+<html>
+	<head>
+		<title>RPiCam</title>
+		<script>
+			const takePicture = (gain,shutter)=>{
+				fetch(`cam.php?gain=${gain}&shutter=${shutter}`).then(
+					()=>{bigImage.src=`snap.jpg?rnd=${Math.random()}`;}
+				);
+			}
+		</script>
+	</head>
+	<body>
+		<img id='bigImage' src='snap.jpg' style='width:98vw;'/>
+		<label>Shutter time (uS):<input id='shutterInput' value='30000'/></label>
+		<label>Sensor gain (min 1.0): <input id='gainInput' value='1.0'/></label>
+		<button onclick='takePicture(gainInput.value,shutterInput.value);'>Snap</button>
+	</body>
+</html>
