@@ -36,9 +36,10 @@
 		//modify settings here
 		$err = $avgY-$TARGET_Y;
 		$correction = $P * $err;
-		if($correction>0 && $numOE>$MAX_OE_PCT*$N){$correction=-10000;}
+		if($correction>0 && $numOE>$MAX_OE_PCT*$N){$correction=-20000;}
 		if(abs($correction)>=10000){
 			$settings['shutter']=round($settings['shutter']+$correction);
+			if($settings['shutter']<500){$settings['shutter']=500;}
 			echo("Updating exposure time to {$settings['shutter']} uS\n");
 		}
 		file_put_contents("/var/www/html/tlapse/ex_stats.txt","avgY:{$avgY},numOE:{$numOE},cor:$correction,shutter:{$settings['shutter']}");
