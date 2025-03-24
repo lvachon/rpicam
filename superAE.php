@@ -2,9 +2,9 @@
 	exec("rpicam-still -c /var/www/html/tlapse/live_settings.txt --output /var/www/html/tlapse/latest.jpg");
 	exec("cp /var/www/html/tlapse/latest.jpg /var/www/html/tlapse/".date("Ymdhis").".jpg");
 	$N=10000;
-	$MAX_OE_PCT=0.05;
-	$TARGET_Y=48;
-	$P = -2000;
+	$MAX_OE_PCT=0.10;
+	$TARGET_Y=30;
+	$P = -750;
 	$settingsFile = file_get_contents("/var/www/html/tlapse/live_settings.txt");
 	$settingsLines = explode("\n",$settingsFile);
 	$settings = array();
@@ -25,24 +25,30 @@
 			$r=$c&255;
 			$g=($c/256)&255;
 			$b=($c/65536)&255;
+			$lR = pow($r/255,2.2);
+			$lG = pow($g/255,2.2);
+			$lB = pow($b/255,2.2);
 			$y= 0.299*$r + 0.587*$g + 0.114*$b;
+			$lY = 0.299*$lR+0.587*$lG+0.114*$lB;
+			$lY = $lY*255;
 			if($r>250||$g>250||$b>250){
 				$numOE+=1;
 			}
-			$avgY+=$y;
+			$avgY+=$lY;
 			//echo("$c=;r=$r,g=$g,b=$b,y=$y\n");
 		}
 		$avgY/=$N;
-		echo("AVERAGE Y:".$avgY."\n");
-		echo("NUM OVEREX:".$numOE."\n");
+		echo("\n----------------------------------------\n");
+		echo("AVERAGE Y:".$avgY." / $TARGET_Y\n");
+		echo("NUM OVEREX:".$numOE." (".strval(floor(1000*$numOE/$N)/10.0)."% / ".strval(100.0*$MAX_OE_PCT)."%)\n");
 		//modify settings here
 		$err = $avgY-$TARGET_Y;
 		$correction = $P * $err;
-		if($correction>0 && $numOE>$MAX_OE_PCT*$N){$correction=-20000;}
-		if(abs($correction)>=10000){
+		if($correction>0 && $numOE>$MAX_OE_PCT*$N){$correction=-1000;}
+		if(abs($correction)>=1000){
 			$settings['shutter']=round($settings['shutter']+$correction);
 			if($settings['shutter']<500){$settings['shutter']=500;}
-			echo("Updating exposure time to {$settings['shutter']} uS\n");
+			echo("Updating exposure time to {$settings['shutter']} uS with a $correction uS adjustment\n");
 		}
 		file_put_contents("/var/www/html/tlapse/ex_stats.txt","avgY:{$avgY},numOE:{$numOE},cor:$correction,shutter:{$settings['shutter']}");
 	}
