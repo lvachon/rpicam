@@ -1,0 +1,7 @@
+rotation=0
+immediate=
+nopreview=
+awb=daylight
+exposure=long
+shutter=211728
+gain=1

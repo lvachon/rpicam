@@ -4,13 +4,16 @@
 		<script>
 			const takePicture = (gain,shutter)=>{
 				fetch(`cam.php?gain=${gain}&shutter=${shutter}`).then(
-					()=>{bigImage.src=`snap.jpg?rnd=${Math.random()}`;}
+					refreshImage()
 				);
 			}
+			let thh = 0;
+			const refreshImage = ()=>{bigImage.src=`snap.jpg?rnd=${Math.random()}`;clearTimeout(thh);thh=setTimeout(refreshImage,1000);}
+
 		</script>
 	</head>
 	<body>
-		<img id='bigImage' src='snap.jpg' style='width:98vw;'/>
+		<img id='bigImage' src='snap.jpg' style='max-width:98vw;max-height:calc(98vh - 2em);display:block;'/>
 		<label>Shutter time (uS):<input id='shutterInput' value='30000'/></label>
 		<label>Sensor gain (min 1.0): <input id='gainInput' value='1.0'/></label>
 		<button onclick='takePicture(gainInput.value,shutterInput.value);'>Snap</button>
