@@ -4,7 +4,9 @@
 	$N=10000;
 	$MAX_OE_PCT=0.10;
 	$TARGET_Y=30;
-	$P = -750;
+	$P = -10000;
+	$MAX_SHUTTER = 5000000;
+	$MIN_SHUTTER = 500;
 	$settingsFile = file_get_contents("/var/www/html/tlapse/live_settings.txt");
 	$settingsLines = explode("\n",$settingsFile);
 	$settings = array();
@@ -21,7 +23,7 @@
 		$numOE=0;
 		for($i=0;$i<$N;$i++){
 			//we only care about exposure, so convert RGB to luminance
-			$c = imagecolorat($im,rand(0,imagesx($im)),rand(0,imagesy($im)));
+			$c = imagecolorat($im,rand(0,imagesx($im)-1),rand(0,imagesy($im)-1));
 			$r=$c&255;
 			$g=($c/256)&255;
 			$b=($c/65536)&255;
@@ -45,9 +47,26 @@
 		$err = $avgY-$TARGET_Y;
 		$correction = $P * $err;
 		if($correction>0 && $numOE>$MAX_OE_PCT*$N){$correction=-1000;}
-		if(abs($correction)>=1000){
+		if(abs($correction)>=5000){
 			$settings['shutter']=round($settings['shutter']+$correction);
-			if($settings['shutter']<500){$settings['shutter']=500;}
+			if($settings['shutter']<$MIN_SHUTTER){
+				$settings['shutter']=$MIN_SHUTTER;
+				echo("shutter too fast, lowering gain\n");
+				$settings['gain']-=0.5;
+			}
+			if($settings['shutter']>$MAX_SHUTTER){
+				$settings['shutter']=$MAX_SHUTTER;
+				echo("shutter too slow, raising gain\n");
+				$settings['gain']+=0.5;
+			}
+			if($settings['gain']<1){
+				$settings['gain']=1;
+				echo("gain too low, limiting to 1\n");
+			}
+			if($settings['gain']>8){
+				echo("gain too high, limiting to 8\n");
+				$settings['gain']=8;
+			}
 			echo("Updating exposure time to {$settings['shutter']} uS with a $correction uS adjustment\n");
 		}
 		file_put_contents("/var/www/html/tlapse/ex_stats.txt","avgY:{$avgY},numOE:{$numOE},cor:$correction,shutter:{$settings['shutter']}");
