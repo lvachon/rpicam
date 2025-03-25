@@ -2,11 +2,11 @@
 	exec("rpicam-still -c /var/www/html/tlapse/live_settings.txt --output /var/www/html/tlapse/latest.jpg");
 	exec("cp /var/www/html/tlapse/latest.jpg /var/www/html/tlapse/".date("Ymdhis").".jpg");
 	$N=10000;
-	$MAX_OE_PCT=0.10;
-	$TARGET_Y=30;
-	$P = -10000;
+	$MAX_OE_PCT=0.05;
+	$TARGET_Y=40;
+	$P = 1.0;
 	$MAX_SHUTTER = 5000000;
-	$MIN_SHUTTER = 500;
+	$MIN_SHUTTER = 50;
 	$settingsFile = file_get_contents("/var/www/html/tlapse/live_settings.txt");
 	$settingsLines = explode("\n",$settingsFile);
 	$settings = array();
@@ -44,11 +44,11 @@
 		echo("AVERAGE Y:".$avgY." / $TARGET_Y\n");
 		echo("NUM OVEREX:".$numOE." (".strval(floor(1000*$numOE/$N)/10.0)."% / ".strval(100.0*$MAX_OE_PCT)."%)\n");
 		//modify settings here
-		$err = $avgY-$TARGET_Y;
-		$correction = $P * $err;
-		if($correction>0 && $numOE>$MAX_OE_PCT*$N){$correction=-1000;}
-		if(abs($correction)>=5000){
-			$settings['shutter']=round($settings['shutter']+$correction);
+		$err = $TARGET_Y/$avgY;
+		$correction = $P * $settings['shutter'] * $err;
+		if($correction>0 && $numOE>$MAX_OE_PCT*$N){$correction=$P;}
+		if(abs($correction)>=100 || true){
+			$settings['shutter']=round(($settings['shutter']+$correction)/2);
 			if($settings['shutter']<$MIN_SHUTTER){
 				$settings['shutter']=$MIN_SHUTTER;
 				echo("shutter too fast, lowering gain\n");
