@@ -1,5 +1,5 @@
 <?php
-	date_timezone_set("America/New_York");
+	date_default_timezone_set("America/New_York");
 	exec("rpicam-still -c /var/www/html/tlapse/live_settings.txt --output /var/www/html/tlapse/latest.jpg");
 	sleep(1);
 	exec("cp /var/www/html/tlapse/latest.jpg /var/www/html/tlapse/".date("Y-m-d_H-i-s").".jpg");
