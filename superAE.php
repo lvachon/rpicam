@@ -1,6 +1,6 @@
 <?php
 	exec("rpicam-still -c /var/www/html/tlapse/live_settings.txt --output /var/www/html/tlapse/latest.jpg");
-	exec("cp /var/www/html/tlapse/latest.jpg /var/www/html/tlapse/".date("Ymdhis").".jpg");
+	exec("cp /var/www/html/tlapse/latest.jpg /var/www/html/tlapse/".date("YmdHis").".jpg");
 	$N=10000;
 	$MAX_OE_PCT=0.05;
 	$TARGET_Y=40;
