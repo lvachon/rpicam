@@ -1,5 +1,6 @@
 <?php
 	date_default_timezone_set("America/New_York");
+	//exec("echo none > /sys/class/leds/PWR/trigger");
 	exec("rpicam-still -c /var/www/html/tlapse/live_settings.txt --output /var/www/html/tlapse/latest.jpg");
 	sleep(1);
 	exec("cp /var/www/html/tlapse/latest.jpg /var/www/html/tlapse/".date("Y-m-d_H-i-s").".jpg");
@@ -7,7 +8,7 @@
 	$MAX_OE_PCT=0.05;
 	$TARGET_Y=40;
 	$P = 1.0;
-	$MAX_SHUTTER = 5000000;
+	$MAX_SHUTTER = 20000000;
 	$MIN_SHUTTER = 50;
 	$settingsFile = file_get_contents("/var/www/html/tlapse/live_settings.txt");
 	$settingsLines = explode("\n",$settingsFile);
@@ -65,9 +66,9 @@
 				$settings['gain']=1;
 				echo("gain too low, limiting to 1\n");
 			}
-			if($settings['gain']>8){
+			if($settings['gain']>16){
 				echo("gain too high, limiting to 8\n");
-				$settings['gain']=8;
+				$settings['gain']=16;
 			}
 			echo("Updating exposure time to {$settings['shutter']} uS with a $correction uS adjustment\n");
 		}

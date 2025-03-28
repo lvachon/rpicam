@@ -1,7 +1,10 @@
-rotation=0
 immediate=
 nopreview=
-awb=daylight
-exposure=long
-shutter=211728
+awbgains=1.05,1.65
+shutter=50
 gain=1
+raw=
+lens-position=6.0
+verbose=2
+hdr=off
+thumb=none
