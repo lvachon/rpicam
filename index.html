@@ -20,6 +20,7 @@
 			const index = hScroll.value;
 			bigImage.src = files[files.length-index];
 			imgLink.href = files[files.length-index];
+			drawStats();
 		}
 		const resizeScroll = ()=>{
 			hScroll.style.width = (bigImage.clientWidth-3*dnbtn.clientWidth-16)+"px";
@@ -29,6 +30,7 @@
 			if(!files.length){
 				fetchFileList();
 		                resizeScroll();
+				fetchStats();
 			}else{
 				if(play && hScroll.value<files.length-1){
 					hScroll.stepUp();
@@ -39,13 +41,75 @@
 				}
 			}
 		}
+		let data=[];
+		const fetchStats = async ()=>{
+			fetch("/tlapse/ex_stats.txt").then(response=>response.text()).then(text=>{
+				const str = `[${text}{}]`;//empty object to handle tailing comma
+				data = JSON.parse(str);
+				data.pop();//pop off the last empty object
+				drawStats();
+			});
+		}
+		const drawStats = ()=>{
+			if(data.length<2){return;}
+			canv.width = bigImage.clientWidth-keyElem.clientWidth-8;
+			const ctx = canv.getContext('2d');
+			ctx.fillStyle="#111111";
+			ctx.fillRect(0,0,canv.width,canv.height);
+			const z = Math.max(data.length-1440,0);
+			const len = data.length-z-1;
+			for(let i=data.length-1;i>z;i--){
+				const x1 = (i-z)*canv.width/len;
+				const x2 = (i-1-z)*canv.width/len;
+				//Luminance
+				let y1 = canv.height - canv.height * data[i].avgY/255.0;;
+				let y2 = canv.height - canv.height * data[i-1].avgY/255.0;
+				ctx.strokeStyle="rgb(64,64,255)";
+				ctx.beginPath();
+				ctx.moveTo(x1,y1);
+				ctx.lineTo(x2,y2);
+				ctx.stroke();
+				
+				//Shutter
+				y1 = canv.height - canv.height * Math.log2(data[i].shutter)/26;
+                                y2 = canv.height - canv.height * Math.log2(data[i-1].shutter)/26;
+                                ctx.strokeStyle="rgb(255,64,64)";
+                                ctx.beginPath();
+                                ctx.moveTo(x1,y1);
+                                ctx.lineTo(x2,y2);
+                                ctx.stroke();
+
+				//Gain
+                                y1 = canv.height - canv.height * data[i].gain/16;
+                                y2 = canv.height - canv.height * data[i-1].gain/16;
+                                ctx.strokeStyle="rgb(64,255,64)";
+                                ctx.beginPath();
+                                ctx.moveTo(x1,y1);
+                                ctx.lineTo(x2,y2);
+                                ctx.stroke();
+
+
+			}
+			const cx = canv.width+(hScroll.value-hScroll.max)*canv.width/len;
+			console.log(cx);
+			ctx.strokeStyle="#888888";
+			ctx.beginPath();
+			ctx.moveTo(cx,0);
+			ctx.lineTo(cx,canv.height);
+			ctx.stroke();
+			const i = Math.max(0,data.length-1+(hScroll.value-hScroll.max));
+			lumElem.innerHTML=`Avg Lum<br/>${data[i].avgY.toString().substr(0,7)}`;
+			shutterElem.innerHTML=`Shutter<br/>${Math.floor(data[i].shutter/1000)}ms`;
+			gainElem.innerHTML=`Gain<br/>${data[i].gain}`;
+		}
 	</script>
 	<style>
 		#bigImage {max-width:calc(100vw - 48px);margin:auto;max-height:calc(98vh - 1cm);display:block;}
 		#hscroll {margin:4px;display:block;height:1cm;}
 		body {background:black;}
 		button {height:1cm;width:1cm;font-size:0.4cm;border-radius:8px;}
-		#scrollbox {display:flex;flex-direction:row;margin:auto;width:fit-content;}
+		#scrollbox,#graphbox {display:flex;flex-direction:row;margin:auto;width:fit-content;}
+		#keyElem {line-height:1em;}
 	</style>
 	<body>
 		<a href='/tlapse/latest.jpg' id='imgLink'>
@@ -56,6 +120,14 @@
 			<input type='range' max='0' min='0' id='hScroll' onchange='loadFrame()' onmousemove='loadFrame()'/>
 			<button onclick= 'hScroll.stepUp();loadFrame();'>▶️</button>
 			<button id='playBtn' onclick= 'play=!play;loadFrame();this.innerHTML=play?"⏹️":"⏯️";'>⏯️</button>
+		</div>
+		<div id='graphbox'>
+			<div id='keyElem'>
+				<div id='shutterElem' style='color:rgb(255,64,64)'>Shutter</div>
+				<div id='gainElem' style='color:rgb(64,255,64)'>Gain</div>
+				<div id='lumElem' style='color:rgb(64,64,255)'>Avg Lum</div>
+			</div>
+			<canvas id='canv' height='128'></canvas>
 		</div>
 	</body>
 </html>
