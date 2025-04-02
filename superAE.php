@@ -88,3 +88,4 @@
 		}
 	}
 	file_put_contents("/var/www/html/tlapse/live_settings.txt",$settingsString);
+	exec("vcgencmd measure_temp > /var/www/html/temp.txt");

@@ -98,7 +98,7 @@
 			ctx.stroke();
 			const i = Math.max(0,data.length-1+(hScroll.value-hScroll.max));
 			lumElem.innerHTML=`Avg Lum<br/>${data[i].avgY.toString().substr(0,7)}`;
-			shutterElem.innerHTML=`Shutter<br/>${Math.floor(data[i].shutter/1000)}ms`;
+			shutterElem.innerHTML=`Shutter<br/>${Math.floor(data[i].shutter/10)/100}ms`;
 			gainElem.innerHTML=`Gain<br/>${data[i].gain}`;
 		}
 	</script>
@@ -109,6 +109,7 @@
 		button {height:1cm;width:1cm;font-size:0.4cm;border-radius:8px;}
 		#scrollbox,#graphbox {display:flex;flex-direction:row;margin:auto;width:fit-content;}
 		#keyElem {line-height:1em;}
+		#tempFrame {height: 2.5em;border: none;overflow: hidden;width: 8em;background: black;position: fixed;top: 8px;right: 8px;}
 	</style>
 	<body>
 		<a href='/tlapse/latest.jpg' id='imgLink'>
@@ -116,7 +117,7 @@
 		</a>
 		<div id='scrollbox'>
 			<button onclick= 'hScroll.stepDown();loadFrame();' id='dnbtn'>◀️</button>
-			<input type='range' max='0' min='0' id='hScroll' onchange='loadFrame()' onmousemove='loadFrame()'/>
+			<input type='range' max='0' min='0' id='hScroll' onchange='loadFrame()'/>
 			<button onclick= 'hScroll.stepUp();loadFrame();'>▶️</button>
 			<button id='playBtn' onclick= 'play=!play;loadFrame();this.innerHTML=play?"⏹️":"⏯️";'>⏯️</button>
 		</div>
@@ -128,6 +129,7 @@
 			</div>
 			<canvas id='canv' height='128'></canvas>
 		</div>
+		<iframe src="/temp.txt" id='tempFrame'/>
 	</body>
 </html>
 		
