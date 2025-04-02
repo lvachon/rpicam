@@ -77,7 +77,7 @@
 			}
 			echo("Updating exposure time to {$settings['shutter']} uS with a $correction uS adjustment\n");
 		}
-		file_put_contents("/var/www/html/tlapse/ex_stats.txt","{time:".strval(time()).",avgY:{$avgY},numOE:{$numOE},cor:$correction,shutter:{$settings['shutter']},gain:{$settings['gain']},rpicam_time:{$dt}},\n",FILE_APPEND);
+		file_put_contents("/var/www/html/tlapse/ex_stats.txt","{\"time\":".strval(time()).",\"avgY\":{$avgY},\"numOE\":{$numOE},\"cor\":$correction,\"shutter\":{$settings['shutter']},\"gain\":{$settings['gain']},\"rpicam_time\":{$dt}},\n",FILE_APPEND);
 	}
 	var_dump($settings);
 	
