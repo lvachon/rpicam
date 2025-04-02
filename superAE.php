@@ -1,15 +1,20 @@
 <?php
 	date_default_timezone_set("America/New_York");
 	//exec("echo none > /sys/class/leds/PWR/trigger");
+	$ot = hrtime(true);
 	exec("rpicam-still -c /var/www/html/tlapse/live_settings.txt --output /var/www/html/tlapse/latest.jpg");
+	$t = hrtime(true);
+	$dt = ($t-$ot)/1000000000.0;
+	echo("IMAGE CAPTURED\n");
 	sleep(1);
 	exec("cp /var/www/html/tlapse/latest.jpg /var/www/html/tlapse/".date("Y-m-d_H-i-s").".jpg");
+	echo("IMAGE COPIED, PROCESSING...\n");
 	$N=10000;
 	$MAX_OE_PCT=0.05;
 	$TARGET_Y=40;
 	$P = 1.0;
-	$MAX_SHUTTER = 20000000;
-	$MIN_SHUTTER = 50;
+	$MAX_SHUTTER = 40000000;
+	$MIN_SHUTTER = 10;
 	$settingsFile = file_get_contents("/var/www/html/tlapse/live_settings.txt");
 	$settingsLines = explode("\n",$settingsFile);
 	$settings = array();
@@ -72,7 +77,7 @@
 			}
 			echo("Updating exposure time to {$settings['shutter']} uS with a $correction uS adjustment\n");
 		}
-		file_put_contents("/var/www/html/tlapse/ex_stats.txt","avgY:{$avgY},numOE:{$numOE},cor:$correction,shutter:{$settings['shutter']}");
+		file_put_contents("/var/www/html/tlapse/ex_stats.txt","{time:".strval(time()).",avgY:{$avgY},numOE:{$numOE},cor:$correction,shutter:{$settings['shutter']},gain:{$settings['gain']},rpicam_time:{$dt}},\n",FILE_APPEND);
 	}
 	var_dump($settings);
 	

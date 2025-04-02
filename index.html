@@ -1,21 +1,62 @@
 <html>
 	<head>
-		<title>RPiCam</title>
-		<script>
-			const takePicture = (gain,shutter)=>{
-				fetch(`cam.php?gain=${gain}&shutter=${shutter}`).then(
-					refreshImage()
-				);
-			}
-			let thh = 0;
-			const refreshImage = ()=>{bigImage.src=`snap.jpg?rnd=${Math.random()}`;clearTimeout(thh);thh=setTimeout(refreshImage,1000);}
-
-		</script>
+		<title>Skycam</title>
+		<meta charset="utf-8"/>
 	</head>
+	<script>
+		let files=[];
+		let play=false;
+		const fetchFileList = async ()=>{
+			fetch("/tlapse/?C=M;O=D").then(response=>response.text()).then(text=>{
+				const matches = [...text.matchAll(/href="([0-9\-_]+\.jpg)"/gm)];
+				files = matches.map(([full,file])=>(`/tlapse/${file}`));
+				bigImage.src = files[0];
+				hScroll.max = files.length-1;
+				hScroll.min = Math.max(0,files.length-1441);
+				hScroll.value = hScroll.max;
+			});
+		}
+		const loadFrame = ()=>{
+			const index = hScroll.value;
+			bigImage.src = files[files.length-index];
+			imgLink.href = files[files.length-index];
+		}
+		const resizeScroll = ()=>{
+			hScroll.style.width = (bigImage.clientWidth-3*dnbtn.clientWidth-16)+"px";
+		}
+		addEventListener("resize",resizeScroll);
+		const init = ()=>{
+			if(!files.length){
+				fetchFileList();
+		                resizeScroll();
+			}else{
+				if(play && hScroll.value<files.length-1){
+					hScroll.stepUp();
+					loadFrame();
+				}else{
+					play=false;
+					playBtn.innerHTML="⏯️";
+				}
+			}
+		}
+	</script>
+	<style>
+		#bigImage {max-width:calc(100vw - 48px);margin:auto;max-height:calc(98vh - 1cm);display:block;}
+		#hscroll {margin:4px;display:block;height:1cm;}
+		body {background:black;}
+		button {height:1cm;width:1cm;font-size:0.4cm;border-radius:8px;}
+		#scrollbox {display:flex;flex-direction:row;margin:auto;width:fit-content;}
+	</style>
 	<body>
-		<img id='bigImage' src='snap.jpg' style='max-width:98vw;max-height:calc(98vh - 2em);display:block;'/>
-		<label>Shutter time (uS):<input id='shutterInput' value='30000'/></label>
-		<label>Sensor gain (min 1.0): <input id='gainInput' value='1.0'/></label>
-		<button onclick='takePicture(gainInput.value,shutterInput.value);'>Snap</button>
+		<a href='/tlapse/latest.jpg' id='imgLink'>
+			<img id='bigImage' src='/tlapse/latest.jpg' onload='init()'/>
+		</a>
+		<div id='scrollbox'>
+			<button onclick= 'hScroll.stepDown();loadFrame();' id='dnbtn'>◀️</button>
+			<input type='range' max='0' min='0' id='hScroll' onchange='loadFrame()' onmousemove='loadFrame()'/>
+			<button onclick= 'hScroll.stepUp();loadFrame();'>▶️</button>
+			<button id='playBtn' onclick= 'play=!play;loadFrame();this.innerHTML=play?"⏹️":"⏯️";'>⏯️</button>
+		</div>
 	</body>
 </html>
+		
