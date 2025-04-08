@@ -44,7 +44,11 @@
 		let data=[];
 		const fetchStats = async ()=>{
 			fetch("/tlapse/ex_stats.txt").then(response=>response.text()).then(text=>{
-				const str = `[${text}{}]`;//empty object to handle tailing comma
+				
+				const str = `[${text}{}]`.replaceAll(/[^\s\da-zA-Z\.\{\},:\[\]"]/g,"");
+				//empty object to handle tailing comma
+				//regexp to strip shit chars when we crash during a write
+				//console.log(str);
 				data = JSON.parse(str);
 				data.pop();//pop off the last empty object
 				drawStats();
