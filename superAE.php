@@ -57,6 +57,7 @@
 		if($correction>0 && $numOE>$MAX_OE_PCT*$N){$correction=$P;}
 		if(abs($correction)>=100 || true){
 			$settings['shutter']=round(($settings['shutter']+$correction)/2);
+			if($avgY>200){$settings['gain']-=0.5;}
 			if($settings['shutter']<$MIN_SHUTTER){
 				$settings['shutter']=$MIN_SHUTTER;
 				echo("shutter too fast, lowering gain\n");
