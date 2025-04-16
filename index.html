@@ -43,7 +43,7 @@
 		}
 		let data=[];
 		const fetchStats = async ()=>{
-			fetch("/tlapse/ex_stats.txt").then(response=>response.text()).then(text=>{
+			fetch(`/tlapse/ex_stats.txt?rnd=${Math.random()}`).then(response=>response.text()).then(text=>{
 				
 				const str = `[${text}{}]`.replaceAll(/[^\s\da-zA-Z\.\{\},:\[\]"]/g,"");
 				//empty object to handle tailing comma
@@ -107,12 +107,12 @@
 		}
 	</script>
 	<style>
-		#bigImage {max-width:calc(100vw - 48px);margin:auto;max-height:calc(98vh - 1cm);display:block;}
+		#bigImage {max-width:calc(100vw - 48px);margin:auto;max-height:calc(98vh - 1cm);display:block;min-height:256px}
 		#hscroll {margin:4px;display:block;height:1cm;}
 		body {background:black;}
 		button {height:1cm;width:1cm;font-size:0.4cm;border-radius:8px;}
 		#scrollbox,#graphbox {display:flex;flex-direction:row;margin:auto;width:fit-content;}
-		#keyElem {line-height:1em;}
+		#keyElem {line-height:1em;width:6em;}
 		#tempFrame {height: 2.5em;border: none;overflow: hidden;width: 8em;background: black;position: fixed;top: 8px;right: 8px;}
 	</style>
 	<body>
