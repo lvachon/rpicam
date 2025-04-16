@@ -1,7 +1,7 @@
 <?php
 date_default_timezone_set("America/New_York");
 exec("find /var/www/html/tlapse/ -type f -size 0b -delete");
-for($i=1;$i<30;$i++){
+for($i=2;$i<30;$i++){
 	$pastTime = time()-86400*$i;
 	$pastString = date("Y-m-d",$pastTime);
 	$commandString = "scp -i /home/brock/brock__scp_key /var/www/html/tlapse/{$pastString}_*.jpg brock@192.168.1.14:/archive/cams/sky/";
