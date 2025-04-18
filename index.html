@@ -33,8 +33,10 @@
 				fetchStats();
 			}else{
 				if(play && hScroll.value<files.length-1){
-					hScroll.stepUp();
-					loadFrame();
+					setTimeout(()=>{
+						hScroll.stepUp();
+						loadFrame();
+					},125);
 				}else{
 					play=false;
 					playBtn.innerHTML="⏯️";
@@ -92,6 +94,16 @@
                                 ctx.lineTo(x2,y2);
                                 ctx.stroke();
 
+				 //Temp
+                                y1 = canv.height - canv.height * data[i].temp/90;
+                                y2 = canv.height - canv.height * data[i-1].temp/90;
+                                ctx.strokeStyle="rgb(255,220,64)";
+                                ctx.beginPath();
+                                ctx.moveTo(x1,y1);
+                                ctx.lineTo(x2,y2);
+                                ctx.stroke();
+
+
 
 			}
 			const cx = canv.width+(hScroll.value-hScroll.max)*canv.width/len;
@@ -104,6 +116,7 @@
 			lumElem.innerHTML=`Avg Lum<br/>${data[i].avgY.toString().substr(0,7)}`;
 			shutterElem.innerHTML=`Shutter<br/>${Math.floor(data[i].shutter/10)/100}ms`;
 			gainElem.innerHTML=`Gain<br/>${data[i].gain}`;
+			tempElem.innerHTML=`Temp<br/>${data[i].temp}C`;
 		}
 	</script>
 	<style>
@@ -130,10 +143,11 @@
 				<div id='shutterElem' style='color:rgb(255,64,64)'>Shutter</div>
 				<div id='gainElem' style='color:rgb(64,255,64)'>Gain</div>
 				<div id='lumElem' style='color:rgb(64,64,255)'>Avg Lum</div>
+				<div id='tempElem' style='color:rgb(255,220,64)'>Temp</div>
 			</div>
 			<canvas id='canv' height='128'></canvas>
 		</div>
-		<iframe src="/temp.txt" id='tempFrame'/>
+		<!--<iframe src="/temp.txt" id='tempFrame'/>-->
 	</body>
 </html>
 		

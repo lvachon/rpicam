@@ -78,7 +78,10 @@
 			}
 			echo("Updating exposure time to {$settings['shutter']} uS with a $correction uS adjustment\n");
 		}
-		file_put_contents("/var/www/html/tlapse/ex_stats.txt","{\"time\":".strval(time()).",\"avgY\":{$avgY},\"numOE\":{$numOE},\"cor\":$correction,\"shutter\":{$settings['shutter']},\"gain\":{$settings['gain']},\"rpicam_time\":{$dt}},\n",FILE_APPEND);
+		$ou = array();
+		exec("vcgencmd measure_temp",$ou);
+		$temp = floatval(explode("=",$ou[0])[1]);
+		file_put_contents("/var/www/html/tlapse/ex_stats.txt","{\"time\":".strval(time()).",\"avgY\":{$avgY},\"numOE\":{$numOE},\"cor\":$correction,\"shutter\":{$settings['shutter']},\"gain\":{$settings['gain']},\"rpicam_time\":{$dt},\"temp\":{$temp}},\n",FILE_APPEND);
 	}
 	var_dump($settings);
 	
@@ -89,4 +92,3 @@
 		}
 	}
 	file_put_contents("/var/www/html/tlapse/live_settings.txt",$settingsString);
-	exec("vcgencmd measure_temp > /var/www/html/temp.txt");
