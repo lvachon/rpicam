@@ -4,7 +4,7 @@ exec("find /var/www/html/tlapse/ -type f -size 0b -delete");
 for($i=2;$i<30;$i++){
 	$pastTime = time()-86400*$i;
 	$pastString = date("Y-m-d",$pastTime);
-	$commandString = "scp -i /home/brock/brock__scp_key /var/www/html/tlapse/{$pastString}_*.jpg brock@192.168.1.14:/archive/cams/sky/";
+	$commandString = "scp -i /home/lvachon/ssh_key /var/www/html/tlapse/{$pastString}_*.jpg lvachon@192.168.1.14:/archive/cams/sky/";
 	$killString = "rm /var/www/html/tlapse/{$pastString}_*.jpg";
 	echo "Copying $pastString\n";
 	exec($commandString);

@@ -13,7 +13,7 @@
 	$MAX_OE_PCT=0.05;
 	$TARGET_Y=40;
 	$P = 1.0;
-	$MAX_SHUTTER = 40000000;
+	$MAX_SHUTTER = 50000000;
 	$MIN_SHUTTER = 10;
 	$settingsFile = file_get_contents("/var/www/html/tlapse/live_settings.txt");
 	$settingsLines = explode("\n",$settingsFile);
@@ -56,8 +56,12 @@
 		$correction = $P * $settings['shutter'] * $err;
 		if($correction>0 && $numOE>$MAX_OE_PCT*$N){$correction=$P;}
 		if(abs($correction)>=100 || true){
+			if($correction<-200 && $gain>1){
+				$correction=0;
+				$gain-=0.5;
+			}
 			$settings['shutter']=round(($settings['shutter']+$correction)/2);
-			if($avgY>3*$TARGET_Y){$settings['gain']-=0.5;}
+			//if($avgY>3*$TARGET_Y){$settings['gain']-=0.5;}
 			if($settings['shutter']<$MIN_SHUTTER){
 				$settings['shutter']=$MIN_SHUTTER;
 				echo("shutter too fast, lowering gain\n");

@@ -1,7 +1,7 @@
 immediate=
 nopreview=
-awbgains=1.05,1.65
-shutter=50
+awbgains=1.90,2.0
+shutter=2999
 gain=1
 raw=
 lens-position=6.0
