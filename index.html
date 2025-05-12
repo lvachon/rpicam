@@ -119,6 +119,13 @@
 			gainElem.innerHTML=`Gain<br/>${data[i].gain}`;
 			tempElem.innerHTML=`Temp<br/>${data[i].temp}C`;
 		}
+		const canvClick = (event)=>{
+			//console.log(event);
+			const px = event.offsetX / canv.offsetWidth;
+			//console.log(px);
+			hScroll.value=(Math.round(px*(hScroll.max-hScroll.min))+hScroll.min*1.0);
+			loadFrame();
+		};
 	</script>
 	<style>
 		#bigImage {max-width:calc(100vw - 48px);margin:auto;max-height:calc(98vh - 1cm);display:block;min-height:256px}
@@ -147,7 +154,7 @@
 				<div id='lumElem' style='color:rgb(64,64,255)'>Avg Lum</div>
 				<div id='tempElem' style='color:rgb(255,220,64)'>Temp</div>
 			</div>
-			<canvas id='canv' height='128'></canvas>
+			<canvas id='canv' height='128' onclick='canvClick(event)'></canvas>
 		</div>
 		<!--<iframe src="/temp.txt" id='tempFrame'/>-->
 	</body>
