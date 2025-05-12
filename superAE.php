@@ -68,9 +68,9 @@
 				$settings['gain']-=0.5;
 			}
 			if($settings['shutter']>$MAX_SHUTTER){
+				$settings['gain']+=(($settings['shutter']-$MAX_SHUTTER)/$MAX_SHUTTER);
 				$settings['shutter']=$MAX_SHUTTER;
 				echo("shutter too slow, raising gain\n");
-				$settings['gain']+=0.5;
 			}
 			if($settings['gain']<1){
 				$settings['gain']=1;

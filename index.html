@@ -34,12 +34,13 @@
 			}else{
 				if(play && hScroll.value<files.length-1){
 					setTimeout(()=>{
-						hScroll.stepUp();
+						hScroll.stepUp(play);
 						loadFrame();
 					},125);
 				}else{
 					play=false;
 					playBtn.innerHTML="⏯️";
+					ffdBtn.innerHTML="⏩";
 				}
 			}
 		}
@@ -136,7 +137,8 @@
 			<button onclick= 'hScroll.stepDown();loadFrame();' id='dnbtn'>◀️</button>
 			<input type='range' max='0' min='0' id='hScroll' onchange='loadFrame()'/>
 			<button onclick= 'hScroll.stepUp();loadFrame();'>▶️</button>
-			<button id='playBtn' onclick= 'play=!play;loadFrame();this.innerHTML=play?"⏹️":"⏯️";'>⏯️</button>
+			<button id='playBtn' onclick= 'play=play?0:1;loadFrame();this.innerHTML=play?"⏹️":"⏯️";'>⏯️</button>
+			<button id='ffdBtn' onclick= 'play=play?0:10;loadFrame();this.innerHTML=play?"⏹️":"⏩";'>⏩</button>
 		</div>
 		<div id='graphbox'>
 			<div id='keyElem'>
