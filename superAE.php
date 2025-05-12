@@ -54,10 +54,10 @@
 		//modify settings here
 		$err = $TARGET_Y/$avgY;
 		$correction = $P * $settings['shutter'] * $err;
-		if($correction>0 && $numOE>$MAX_OE_PCT*$N){$correction=$P * $settings['shutter']*0.9;}
+		if($correction>0 && $numOE>$MAX_OE_PCT*$N){$correction=$P * $settings['shutter']*0.5;}
 		if(abs($correction)>=100 || true){
 			if($settings['gain']>1 && $correction<$settings['shutter']){
-				$settings['gain']-=(1.0-$correction/$settings['shutter'])/2.0;
+				$settings['gain']-=(1.0-$correction/$settings['shutter']);
 				$correction=$settings['shutter'];
 			}
 			$settings['shutter']=round(($settings['shutter']+$correction)/2);
