@@ -16,8 +16,8 @@ BOM so far:
 * A tripod with 1/4-20 shoe
 * A clamping phone mount for 1/4-20 tripods
 * 2 x right angle usb C adapters
-* A silicon jacketed, non-braided, 6 foot, USB A-C cable
-* A 12 marine grade (ha!) USB power adapter thing
+* A silicon jacketed, _non-braided_, 6 foot, USB A-C cable
+* A 12v marine grade (ha!) USB power adapter thing
 * Various bits of wire and some lever nuts
 * 20 Lbs of lead (seriously)
 * 3D printed mounting plate that secures camera to the back of the Raspberry Pi
@@ -52,7 +52,7 @@ Assembly (note, most electrical and all software details are glossed over. a mil
 
 Parts I've destroyed so far:
 * 2 x Raspberry Pi 4 Model B (overvoltage to the USB port, both times.  The safety diode took the first hit spectacularly, magic smoke and everything.  The second board got properly killed all throughout.  The primary culprit was the USB controller roasting at 200F, but it turns out the SD card was also bricked.)
-* 1 x 3 foot, _braided_, USB C to right-angle slimline USB C.  (This was killed when the wind over the tripod during a rainstorm.  This allowed water to wick through the braided cable, through the grommet, and into the power connector.  Where it them played galvanic rock-paper-scissors with all the metals involved, and in the end I lost.)
+* 1 x 3 foot, _braided_, USB C to right-angle slimline USB C.  (This was killed when the wind knocked over the tripod during a rainstorm.  This allowed water to wick through the braided cable, through the grommet, and into the power connector.  Where it them played galvanic rock-paper-scissors with all the metals involved, and in the end I lost.)
 * 1 x 12v to USB power thing (rain damage, see above)
 * 1 x Raspberry Pi camera module v3 (wide fov, noir) (Somehow smashed it's tiny little lens during all of this)
 * 1 x Microcenter 64GB MicroSD card (my bin of them is running low...)
