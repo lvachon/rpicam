@@ -1,10 +1,9 @@
-immediate=
-nopreview=
-awbgains=1.90,2.0
-shutter=2999
+immediate=on
+nopreview=on
+awbgains=3.8,1.4
+shutter=344
 gain=1
-raw=
+raw=on
 lens-position=6.0
-verbose=2
-hdr=off
+verbose=0
 thumb=none
