@@ -10,8 +10,8 @@
 	exec("cp /var/www/html/tlapse/latest.jpg /var/www/html/tlapse/".date("Y-m-d_H-i-s").".jpg");
 	echo("IMAGE COPIED, PROCESSING...\n");
 	$N=10000;
-	$MAX_OE_PCT=0.05;
-	$TARGET_Y=64;
+	$MAX_OE_PCT=0.03;
+	$TARGET_Y=52;
 	$P = 1.0;
 	$MAX_SHUTTER = 50000000;
 	$MIN_SHUTTER = 10;
@@ -51,42 +51,43 @@
 		echo("\n----------------------------------------\n");
 		echo("AVERAGE Y:".$avgY." / $TARGET_Y\n");
 		echo("NUM OVEREX:".$numOE." (".strval(floor(1000*$numOE/$N)/10.0)."% / ".strval(100.0*$MAX_OE_PCT)."%)\n");
-		//modify settings here
-		$err = $TARGET_Y/$avgY;
-		$target = $settings['shutter'] * $err;
-		$correction = ($target - $settings['shutter']) * $P +$settings['shutter'];
-		if($correction>0 && $numOE>$MAX_OE_PCT*$N){$correction=$settings['shutter']*0.5;}
-		if(abs($correction)>=100 || true){
-			if($settings['gain']>1 && $correction<$settings['shutter']){
-				$settings['gain']-=(1.0-$correction/$settings['shutter']);
-				$correction=$settings['shutter'];
-			}
-			$settings['shutter']=round(($settings['shutter']+$correction)/2);
-			//if($avgY>3*$TARGET_Y){$settings['gain']-=0.5;}
-			if($settings['shutter']<$MIN_SHUTTER){
-				$settings['shutter']=$MIN_SHUTTER;
-				echo("shutter too fast, lowering gain\n");
-				$settings['gain']-=0.5;
-			}
-			if($settings['shutter']>$MAX_SHUTTER){
-				$settings['gain']+=(($settings['shutter']-$MAX_SHUTTER)/$MAX_SHUTTER);
-				$settings['shutter']=$MAX_SHUTTER;
-				echo("shutter too slow, raising gain\n");
-			}
-			if($settings['gain']<1){
-				$settings['gain']=1;
-				echo("gain too low, limiting to 1\n");
-			}
-			if($settings['gain']>16){
-				echo("gain too high, limiting to 8\n");
-				$settings['gain']=16;
-			}
-			echo("Updating exposure time to {$settings['shutter']} uS with a $correction uS adjustment\n");
+		//compute error, absolute target, and correction target
+		$err = $TARGET_Y/$avgY;//How exposed are we 50%, 100%, etc...
+		$target = $settings['shutter'] * $err;//Choose new shutter to correct for previous exposure
+		$correction = ($target - $settings['shutter']) * $P +$settings['shutter'];//Move setting towards that shutter based on our P value
+		$oshutter = $settings['shutter'];
+		if($correction>0 && $numOE>$MAX_OE_PCT*$N){$correction=min($correction,$settings['shutter']*0.75);}//If there are too many overexposed pixels, make sure the shutter lowers by at least 25%
+		if($settings['gain']>1 && $correction<$settings['shutter']){//If we're lowering the shutter and gain is non-unity, lower gain instead
+			$settings['gain']-=(1.0-$correction/$settings['shutter']);
+			$correction=$settings['shutter'];
 		}
+		//Apply correction
+		$settings['shutter']=$correction;
+		//Apply limits
+		if($settings['shutter']<$MIN_SHUTTER){//Shutter to fast, lowering gain if we can
+			$settings['shutter']=$MIN_SHUTTER;
+			echo("shutter too fast, lowering gain\n");
+			$settings['gain']-=($MIN_SHUTTER-$settings['shutter'])/$MIN_SHUTTER;
+		}
+		if($settings['shutter']>$MAX_SHUTTER){//Shutter too high, raising gain if we can
+			$settings['gain']+=(($settings['shutter']-$MAX_SHUTTER)/$MAX_SHUTTER);
+			$settings['shutter']=$MAX_SHUTTER;
+			echo("shutter too slow, raising gain\n");
+		}
+		if($settings['gain']<1){
+			$settings['gain']=1;
+			echo("gain too low, limiting to 1\n");
+		}
+		if($settings['gain']>16){
+			echo("gain too high, limiting to 8\n");
+			$settings['gain']=16;
+		}
+		echo("Updating exposure time from {$oshutter}uS to {$settings['shutter']}uS with a target of {$target}uS \n");
+		
 		$ou = array();
 		exec("vcgencmd measure_temp",$ou);
 		$temp = floatval(explode("=",$ou[0])[1]);
-		file_put_contents("/var/www/html/tlapse/ex_stats.txt","{\"time\":".strval(time()).",\"avgY\":{$avgY},\"numOE\":{$numOE},\"cor\":$correction,\"shutter\":{$settings['shutter']},\"gain\":{$settings['gain']},\"rpicam_time\":{$dt},\"temp\":{$temp}},\n",FILE_APPEND);
+		file_put_contents("/var/www/html/tlapse/ex_stats.txt","{\"time\":".strval(time()).",\"avgY\":{$avgY},\"numOE\":{$numOE},\"cor\":$correction,\"target\":{$target},\"gain\":{$settings['gain']},\"rpicam_time\":{$dt},\"temp\":{$temp}},\n",FILE_APPEND);
 	}
 	var_dump($settings);
 	
