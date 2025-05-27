@@ -53,8 +53,9 @@
 		echo("NUM OVEREX:".$numOE." (".strval(floor(1000*$numOE/$N)/10.0)."% / ".strval(100.0*$MAX_OE_PCT)."%)\n");
 		//modify settings here
 		$err = $TARGET_Y/$avgY;
-		$correction = $P * $settings['shutter'] * $err;
-		if($correction>0 && $numOE>$MAX_OE_PCT*$N){$correction=$P * $settings['shutter']*0.5;}
+		$target = $settings['shutter'] * $err;
+		$correction = ($target - $settings['shutter']) * $P +$settings['shutter'];
+		if($correction>0 && $numOE>$MAX_OE_PCT*$N){$correction=$settings['shutter']*0.5;}
 		if(abs($correction)>=100 || true){
 			if($settings['gain']>1 && $correction<$settings['shutter']){
 				$settings['gain']-=(1.0-$correction/$settings['shutter']);

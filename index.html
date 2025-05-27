@@ -10,16 +10,23 @@
 			fetch("/tlapse/?C=M;O=D").then(response=>response.text()).then(text=>{
 				const matches = [...text.matchAll(/href="([0-9\-_]+\.jpg)"/gm)];
 				files = matches.map(([full,file])=>(`/tlapse/${file}`));
-				bigImage.src = files[0];
+				bigImage.style.backgroundImage=`url(${files[0]})`;
 				hScroll.max = files.length-1;
 				hScroll.min = Math.max(0,files.length-1441);
 				hScroll.value = hScroll.max;
 			});
 		}
+		const ibuf = new Image();
+		
 		const loadFrame = ()=>{
 			const index = hScroll.value;
-			bigImage.src = files[files.length-index];
-			imgLink.href = files[files.length-index];
+			ibuf.src = `${files[files.length-index]}`;
+			ibuf.onload = ()=>{
+				init();
+				bigImage.style.backgroundImage = `url(${files[files.length-index]})`;
+			}
+			bigImage.innerHTML=files[files.length-index].split("/")[2].replace(".jpg","");
+			bigImage.onclick=`window.open(${files[files.length-index]})`;
 			drawStats();
 		}
 		const resizeScroll = ()=>{
@@ -126,20 +133,34 @@
 			hScroll.value=(Math.round(px*(hScroll.max-hScroll.min))+hScroll.min*1.0);
 			loadFrame();
 		};
+		ibuf.onload = init;
 	</script>
 	<style>
-		#bigImage {max-width:calc(100vw - 48px);margin:auto;max-height:calc(98vh - 1cm);display:block;min-height:256px}
+		#bigImage {width:calc(100vw - 64px);margin:auto;height:calc(98vh - 1cm);display:block;min-height:256px}
 		#hscroll {margin:4px;display:block;height:1cm;}
 		body {background:black;}
 		button {height:1cm;width:1cm;font-size:0.4cm;border-radius:8px;}
 		#scrollbox,#graphbox {display:flex;flex-direction:row;margin:auto;width:fit-content;}
 		#keyElem {line-height:1em;width:6em;}
 		#tempFrame {height: 2.5em;border: none;overflow: hidden;width: 8em;background: black;position: fixed;top: 8px;right: 8px;}
+		#bigImage {
+			cursor:pointer;
+			background:url(tlapse/latest.jpg);
+			background-size:contain;
+			background-position:center;
+			background-repeat:no-repeat;
+			justify-content:end;
+			display:flex;
+			flex-direction:row;
+			align-items:end;
+			font-size:1cm;
+			font-family:sans-serif;
+			color:rgba(255,255,255,0.5);
+		}
 	</style>
 	<body>
-		<a href='/tlapse/latest.jpg' id='imgLink'>
-			<img id='bigImage' src='/tlapse/latest.jpg' onload='init()'/>
-		</a>
+		<div id='bigImage' onclick='window.open("tlapse/latest.jpg")' onload='init()'></div>
+		
 		<div id='scrollbox'>
 			<button onclick= 'hScroll.stepDown();loadFrame();' id='dnbtn'>◀️</button>
 			<input type='range' max='0' min='0' id='hScroll' onchange='loadFrame()'/>
@@ -158,5 +179,6 @@
 		</div>
 		<!--<iframe src="/temp.txt" id='tempFrame'/>-->
 	</body>
+	<script>init();</script>
 </html>
 		
