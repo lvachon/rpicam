@@ -1,17 +1,18 @@
 <?php
 	date_default_timezone_set("America/New_York");
 	//exec("echo none > /sys/class/leds/PWR/trigger");
+	echo("CAPTURING IMAGE\n");
 	$ot = hrtime(true);
 	exec("rpicam-still -c /var/www/html/tlapse/live_settings.txt --output /var/www/html/tlapse/latest.jpg");
 	$t = hrtime(true);
 	$dt = ($t-$ot)/1000000000.0;
-	echo("IMAGE CAPTURED\n");
+	echo("IMAGE CAPTURED ($dt)\n");
 	sleep(1);
 	exec("cp /var/www/html/tlapse/latest.jpg /var/www/html/tlapse/".date("Y-m-d_H-i-s").".jpg");
 	echo("IMAGE COPIED, PROCESSING...\n");
 	$N=10000;
 	$MAX_OE_PCT=0.03;
-	$TARGET_Y=52;
+	$TARGET_Y=64;
 	$P = 1.0;
 	$MAX_SHUTTER = 50000000;
 	$MIN_SHUTTER = 10;
@@ -56,10 +57,11 @@
 		$target = $settings['shutter'] * $err;//Choose new shutter to correct for previous exposure
 		$correction = ($target - $settings['shutter']) * $P +$settings['shutter'];//Move setting towards that shutter based on our P value
 		$oshutter = $settings['shutter'];
-		if($correction>0 && $numOE>$MAX_OE_PCT*$N){$correction=min($correction,$settings['shutter']*0.75);}//If there are too many overexposed pixels, make sure the shutter lowers by at least 25%
+		//if($correction>0 && $numOE>$MAX_OE_PCT*$N){$correction=min($correction,$settings['shutter']*0.75);}//If there are too many overexposed pixels, make sure the shutter lowers by at least 25%
 		if($settings['gain']>1 && $correction<$settings['shutter']){//If we're lowering the shutter and gain is non-unity, lower gain instead
 			$settings['gain']-=(1.0-$correction/$settings['shutter']);
 			$correction=$settings['shutter'];
+			echo("Preferring gain over shutter when lowering exposure\n");
 		}
 		//Apply correction
 		$settings['shutter']=$correction;
@@ -82,12 +84,13 @@
 			echo("gain too high, limiting to 8\n");
 			$settings['gain']=16;
 		}
+		echo("PROCESSING DONE\n");
 		echo("Updating exposure time from {$oshutter}uS to {$settings['shutter']}uS with a target of {$target}uS \n");
 		
 		$ou = array();
 		exec("vcgencmd measure_temp",$ou);
 		$temp = floatval(explode("=",$ou[0])[1]);
-		file_put_contents("/var/www/html/tlapse/ex_stats.txt","{\"time\":".strval(time()).",\"avgY\":{$avgY},\"numOE\":{$numOE},\"cor\":$correction,\"target\":{$target},\"gain\":{$settings['gain']},\"rpicam_time\":{$dt},\"temp\":{$temp}},\n",FILE_APPEND);
+		file_put_contents("/var/www/html/tlapse/ex_stats.txt","{\"time\":".strval(time()).",\"avgY\":{$avgY},\"numOE\":{$numOE},\"shutter\":{$settings['shutter']},\"target\":{$target},\"gain\":{$settings['gain']},\"rpicam_time\":{$dt},\"temp\":{$temp}},\n",FILE_APPEND);
 	}
 	var_dump($settings);
 	
