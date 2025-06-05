@@ -2,6 +2,9 @@
 	<head>
 		<title>Skycam</title>
 		<meta charset="utf-8"/>
+		<link rel="icon" type="image/png" href="skycam.png"/>
+		<link rel="shortcut icon" type="image/png" href="skycam.png"/>
+		<link rel="apple-touch-icon" type="image/png" href="skycam.png"/>
 	</head>
 	<script>
 		let files=[];
@@ -26,7 +29,7 @@
 				bigImage.style.backgroundImage = `url(${files[files.length-index]})`;
 			}
 			bigImage.innerHTML=files[files.length-index].split("/")[2].replace(".jpg","");
-			bigImage.onclick=`window.open(${files[files.length-index]})`;
+			bigImage.onclick=()=>{window.open(`${files[files.length-index]}`);}
 			drawStats();
 		}
 		const resizeScroll = ()=>{
