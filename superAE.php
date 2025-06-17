@@ -16,6 +16,7 @@
 	$P = 1.0;
 	$MAX_SHUTTER = 50000000;
 	$MIN_SHUTTER = 10;
+	$MAX_GAIN = 8;
 	$settingsFile = file_get_contents("/var/www/html/tlapse/live_settings.txt");
 	$settingsLines = explode("\n",$settingsFile);
 	$settings = array();
@@ -80,9 +81,9 @@
 			$settings['gain']=1;
 			echo("gain too low, limiting to 1\n");
 		}
-		if($settings['gain']>16){
-			echo("gain too high, limiting to 8\n");
-			$settings['gain']=16;
+		if($settings['gain']>$MAX_GAIN){
+			echo("gain too high, limiting to $MAX_GAIN\n");
+			$settings['gain']=$MAX_GAIN;
 		}
 		echo("PROCESSING DONE\n");
 		echo("Updating exposure time from {$oshutter}uS to {$settings['shutter']}uS with a target of {$target}uS \n");
